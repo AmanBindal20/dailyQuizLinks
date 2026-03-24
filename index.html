@@ -1,12 +1,492 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Links</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Puzzles for Nerds</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════
+       RESET & BASE
+       ═══════════════════════════════════════════ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #1a1a2e;
+      --bg-card: #16213e;
+      --border: #0f3460;
+      --accent: #e94560;
+      --accent-glow: #ff6b81;
+      --text: #eaeaea;
+      --text-dim: #a0a0b0;
+      --green: #4ecca3;
+      --yellow: #ffd369;
+      --blue: #45b7d1;
+      --purple: #a855f7;
+      --orange: #f97316;
+      --pink: #ec4899;
+      --cyan: #06b6d4;
+      --pixel-size: 4px;
+    }
+
+    body {
+      font-family: 'VT323', monospace;
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ═══════════════════════════════════════════
+       SCANLINE OVERLAY
+       ═══════════════════════════════════════════ */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.08) 2px,
+        rgba(0, 0, 0, 0.08) 4px
+      );
+      z-index: 1000;
+    }
+
+    /* ═══════════════════════════════════════════
+       STARFIELD BACKGROUND
+       ═══════════════════════════════════════════ */
+    .stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .star {
+      position: absolute;
+      background: #fff;
+      border-radius: 0;
+      animation: twinkle var(--duration) infinite alternate;
+    }
+
+    @keyframes twinkle {
+      0% { opacity: 0.2; }
+      100% { opacity: 1; }
+    }
+
+    /* ═══════════════════════════════════════════
+       CONTAINER
+       ═══════════════════════════════════════════ */
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* ═══════════════════════════════════════════
+       HEADER
+       ═══════════════════════════════════════════ */
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      padding: 2rem 1rem;
+    }
+
+    .title-emoji {
+      font-size: 3rem;
+      display: block;
+      margin-bottom: 1rem;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    h1 {
+      font-family: 'Press Start 2P', cursive;
+      font-size: clamp(1.2rem, 4vw, 1.8rem);
+      color: var(--accent);
+      text-shadow:
+        3px 3px 0px #0f3460,
+        0 0 20px rgba(233, 69, 96, 0.3);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .subtitle {
+      font-size: 1.5rem;
+      color: var(--text-dim);
+      letter-spacing: 2px;
+    }
+
+    .greeting {
+      font-size: 1.6rem;
+      color: var(--yellow);
+      margin-top: 1rem;
+      min-height: 1.6rem;
+    }
+
+    /* ═══════════════════════════════════════════
+       PIXEL DIVIDER
+       ═══════════════════════════════════════════ */
+    .pixel-divider {
+      display: flex;
+      justify-content: center;
+      gap: var(--pixel-size);
+      margin: 1.5rem 0;
+    }
+
+    .pixel-divider span {
+      display: block;
+      width: var(--pixel-size);
+      height: var(--pixel-size);
+      background: var(--accent);
+      animation: pixel-fade 1.5s ease-in-out infinite alternate;
+    }
+
+    .pixel-divider span:nth-child(2) { animation-delay: 0.1s; background: var(--yellow); }
+    .pixel-divider span:nth-child(3) { animation-delay: 0.2s; background: var(--green); }
+    .pixel-divider span:nth-child(4) { animation-delay: 0.3s; background: var(--blue); }
+    .pixel-divider span:nth-child(5) { animation-delay: 0.4s; background: var(--purple); }
+    .pixel-divider span:nth-child(6) { animation-delay: 0.5s; background: var(--orange); }
+    .pixel-divider span:nth-child(7) { animation-delay: 0.6s; background: var(--pink); }
+    .pixel-divider span:nth-child(8) { animation-delay: 0.7s; background: var(--cyan); }
+    .pixel-divider span:nth-child(9) { animation-delay: 0.8s; background: var(--accent); }
+    .pixel-divider span:nth-child(10) { animation-delay: 0.9s; background: var(--yellow); }
+    .pixel-divider span:nth-child(11) { animation-delay: 1.0s; background: var(--green); }
+
+    @keyframes pixel-fade {
+      0% { opacity: 0.3; transform: scale(1); }
+      100% { opacity: 1; transform: scale(1.5); }
+    }
+
+    /* ═══════════════════════════════════════════
+       PUZZLE GRID
+       ═══════════════════════════════════════════ */
+    .puzzle-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    /* ═══════════════════════════════════════════
+       PUZZLE CARD
+       ═══════════════════════════════════════════ */
+    .puzzle-card {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      padding: 1.2rem 1.5rem;
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      border-radius: 0;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.15s ease;
+      position: relative;
+      overflow: hidden;
+      image-rendering: pixelated;
+    }
+
+    /* Pixel corner cuts */
+    .puzzle-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 12px;
+      height: 12px;
+      background: var(--bg);
+      clip-path: polygon(100% 0, 0 0, 100% 100%);
+    }
+
+    .puzzle-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--card-color, var(--accent));
+      box-shadow:
+        0 4px 0 0 var(--card-color, var(--accent)),
+        0 0 20px rgba(233, 69, 96, 0.15);
+    }
+
+    .puzzle-card:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .card-emoji {
+      font-size: 2.2rem;
+      flex-shrink: 0;
+      width: 50px;
+      text-align: center;
+    }
+
+    .card-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .card-title {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.75rem;
+      color: var(--card-color, var(--accent));
+      margin-bottom: 0.4rem;
+      line-height: 1.4;
+    }
+
+    .card-desc {
+      font-size: 1.3rem;
+      color: var(--text-dim);
+      line-height: 1.3;
+    }
+
+    .card-arrow {
+      font-size: 1.5rem;
+      color: var(--card-color, var(--accent));
+      flex-shrink: 0;
+      transition: transform 0.15s;
+      font-family: 'Press Start 2P', cursive;
+    }
+
+    .puzzle-card:hover .card-arrow {
+      transform: translateX(4px);
+    }
+
+    /* Card color variants */
+    .puzzle-card[data-color="green"]  { --card-color: var(--green); }
+    .puzzle-card[data-color="yellow"] { --card-color: var(--yellow); }
+    .puzzle-card[data-color="blue"]   { --card-color: var(--blue); }
+    .puzzle-card[data-color="purple"] { --card-color: var(--purple); }
+    .puzzle-card[data-color="orange"] { --card-color: var(--orange); }
+    .puzzle-card[data-color="pink"]   { --card-color: var(--pink); }
+    .puzzle-card[data-color="cyan"]   { --card-color: var(--cyan); }
+
+    /* ═══════════════════════════════════════════
+       FOOTER
+       ═══════════════════════════════════════════ */
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+    }
+
+    .footer-text {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.6rem;
+      color: var(--text-dim);
+      letter-spacing: 1px;
+      line-height: 2;
+    }
+
+    .footer-hearts {
+      margin-top: 0.5rem;
+      font-size: 1.2rem;
+    }
+
+    /* ═══════════════════════════════════════════
+       RESPONSIVE
+       ═══════════════════════════════════════════ */
+    @media (max-width: 500px) {
+      .container {
+        padding: 1.5rem 1rem 3rem;
+      }
+
+      .puzzle-card {
+        padding: 1rem 1.2rem;
+        gap: 1rem;
+      }
+
+      .card-emoji {
+        font-size: 1.8rem;
+        width: 40px;
+      }
+
+      .card-title {
+        font-size: 0.65rem;
+      }
+
+      .card-desc {
+        font-size: 1.15rem;
+      }
+    }
+  </style>
 </head>
 <body>
-    <h1>Welcome to Daily Quiz Links</h1>
-    <p>Here you will find links to various quizzes!</p>
+
+  <!-- Starfield -->
+  <div class="stars" id="stars"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <span class="title-emoji">🧩</span>
+      <h1>Daily Puzzles<br>for Nerds</h1>
+      <div class="pixel-divider">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span>
+      </div>
+      <p class="subtitle">~ SELECT YOUR QUEST ~</p>
+      <p class="greeting" id="greeting"></p>
+    </header>
+
+    <!-- Puzzle Links -->
+    <div class="puzzle-grid">
+
+      <a href="https://www.nytimes.com/games/wordle/index.html"
+         target="_blank" rel="noopener"
+         class="puzzle-card" data-color="green">
+        <span class="card-emoji">🟩</span>
+        <div class="card-info">
+          <div class="card-title">Wordle</div>
+          <div class="card-desc">Guess the 5-letter word in 6 tries</div>
+        </div>
+        <span class="card-arrow">▶</span>
+      </a>
+
+      <a href="https://indiamini.in/play/?show=all"
+         target="_blank" rel="noopener"
+         class="puzzle-card" data-color="orange">
+        <span class="card-emoji">🇮🇳</span>
+        <div class="card-info">
+          <div class="card-title">India Mini Crossword</div>
+          <div class="card-desc">Quick crossword with an Indian twist</div>
+        </div>
+        <span class="card-arrow">▶</span>
+      </a>
+
+      <a href="https://www.thehindu.com/crosswords/thehindu-mini-crossword"
+         target="_blank" rel="noopener"
+         class="puzzle-card" data-color="blue">
+        <span class="card-emoji">📰</span>
+        <div class="card-info">
+          <div class="card-title">Hindu Mini Crossword</div>
+          <div class="card-desc">The Hindu's daily mini crossword</div>
+        </div>
+        <span class="card-arrow">▶</span>
+      </a>
+
+      <a href="https://word.tips/"
+         target="_blank" rel="noopener"
+         class="puzzle-card" data-color="yellow">
+        <span class="card-emoji">💡</span>
+        <div class="card-info">
+          <div class="card-title">Word Tips</div>
+          <div class="card-desc">Word finder & helper for when you're stuck</div>
+        </div>
+        <span class="card-arrow">▶</span>
+      </a>
+
+      <a href="https://referencesgame.com/"
+         target="_blank" rel="noopener"
+         class="puzzle-card" data-color="purple">
+        <span class="card-emoji">🔗</span>
+        <div class="card-info">
+          <div class="card-title">References</div>
+          <div class="card-desc">Find the hidden connections between clues</div>
+        </div>
+        <span class="card-arrow">▶</span>
+      </a>
+
+      <a href="https://www.yearguessr.com/"
+         target="_blank" rel="noopener"
+         class="puzzle-card" data-color="cyan">
+        <span class="card-emoji">📅</span>
+        <div class="card-info">
+          <div class="card-title">Yearguesser</div>
+          <div class="card-desc">Guess the year from historical clues</div>
+        </div>
+        <span class="card-arrow">▶</span>
+      </a>
+
+      <a href="https://angle.wtf/"
+         target="_blank" rel="noopener"
+         class="puzzle-card" data-color="pink">
+        <span class="card-emoji">📐</span>
+        <div class="card-info">
+          <div class="card-title">Angle</div>
+          <div class="card-desc">Guess the angle — deceptively tricky!</div>
+        </div>
+        <span class="card-arrow">▶</span>
+      </a>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <div class="pixel-divider">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span>
+      </div>
+      <p class="footer-text">
+        PRESS START TO PLAY &nbsp;•&nbsp; DAILY RESET AT MIDNIGHT
+      </p>
+      <div class="footer-hearts">❤️ 🧠 ❤️</div>
+    </footer>
+  </div>
+
+  <script>
+    // ── Starfield Generator ──────────────────────────────────
+    (function generateStars() {
+      const container = document.getElementById('stars');
+      const count = 80;
+      for (let i = 0; i < count; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        const size = Math.random() > 0.8 ? 3 : Math.random() > 0.5 ? 2 : 1;
+        star.style.width = size + 'px';
+        star.style.height = size + 'px';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.setProperty('--duration', (1 + Math.random() * 3).toFixed(1) + 's');
+        star.style.animationDelay = (Math.random() * 3).toFixed(1) + 's';
+        container.appendChild(star);
+      }
+    })();
+
+    // ── Daily Greeting ───────────────────────────────────────
+    (function setGreeting() {
+      const greetings = [
+        "🎮 Ready to crush it today?",
+        "⚔️ Another day, another puzzle quest!",
+        "🏆 May your streaks stay unbroken!",
+        "🧠 Brain cells: ACTIVATED",
+        "🔥 Let's get that perfect score!",
+        "⭐ Pro tip: coffee first, puzzles second",
+        "🎯 Today's the day you go 1/6!",
+        "🕹️ INSERT COIN TO CONTINUE",
+        "📊 Nerds assemble!",
+        "💪 No hints. No mercy.",
+        "🌟 Puzzle o'clock!",
+        "🤓 Embrace your inner nerd!",
+      ];
+      // Use the day of year as a seed for consistent daily greeting
+      const now = new Date();
+      const start = new Date(now.getFullYear(), 0, 0);
+      const dayOfYear = Math.floor((now - start) / 86400000);
+      const greeting = greetings[dayOfYear % greetings.length];
+      document.getElementById('greeting').textContent = greeting;
+    })();
+  </script>
+
 </body>
 </html>
